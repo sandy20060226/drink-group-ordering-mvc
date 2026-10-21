@@ -1,0 +1,211 @@
+﻿@model List<Exam.Models.ExamModel>
+
+<h2>訂單管理系統</h2>
+
+
+<br />
+<br />
+
+
+<form action="/Exam" method="get">
+
+    依送貨地址查詢：
+    <input type="text" name="searchString" value="@ViewBag.SearchString" placeholder="請輸入地址關鍵字..." />
+
+    &nbsp;&nbsp;&nbsp;&nbsp;
+
+    請選擇送貨方式：
+    <select name="shipViaSelection">
+        <option value="" selected="@(Convert.ToString(ViewBag.ShipViaSelection) == "")">-- 顯示全部 --</option>
+        <option value="1" selected="@(Convert.ToString(ViewBag.ShipViaSelection) == "1")">1號 郵局</option>
+        <option value="2" selected="@(Convert.ToString(ViewBag.ShipViaSelection) == "2")">2號 聯邦快遞</option>
+        <option value="3" selected="@(Convert.ToString(ViewBag.ShipViaSelection) == "3")">3號 DHL</option>
+    </select>
+
+    &nbsp;&nbsp;&nbsp;&nbsp;
+
+    請選擇員工：
+    <select name="employeeSelection">
+        <option value="" selected="@(Convert.ToString(ViewBag.EmployeeSelection) == "")">-- 顯示全部 --</option>
+        <option value="1" selected="@(Convert.ToString(ViewBag.EmployeeSelection) == "1")">1號 員工</option>
+        <option value="2" selected="@(Convert.ToString(ViewBag.EmployeeSelection) == "2")">2號 員工</option>
+        <option value="3" selected="@(Convert.ToString(ViewBag.EmployeeSelection) == "3")">3號 員工</option>
+    </select>
+
+    &nbsp;&nbsp;&nbsp;&nbsp;
+
+    <button type="submit" style="font-weight: bold;">開始篩選查詢</button>
+
+</form>
+
+
+<br />
+<br />
+
+
+<table border="1" cellpadding="5" style="border-collapse:collapse; width:100%; text-align: left;">
+    <thead>
+        <tr style="background-color: #f2f2f2;">
+            <th>訂單號碼</th>
+            <th>客戶編號</th>
+            <th>員工編號</th>
+            <th>送貨方式</th>
+            <th>收貨人</th>
+            <th>送貨地址</th>
+            <th>城市/區域/郵遞</th>
+            <th style="color: red;">功能操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Count == 0)
+        {
+            <tr>
+                <td colspan="8" style="text-align: center; color: red; font-weight: bold; padding: 20px;">
+                    ❌ 找不到符合篩選條件的訂單資料！
+                </td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var order in Model)
+            {
+                <tr>
+                    <td>@order.OrderId</td>
+                    <td>@order.CustomerId</td>
+                    <td>@order.EmployeeId</td>
+                    <td>@order.ShipVia</td>
+                    <td>@order.ShipName</td>
+                    <td style="background-color: #fffde7;">@order.ShipAddress</td>
+                    <td>@order.ShipCity | @order.ShipRegion | @order.ShipPostalCode</td>
+                    <td>
+                        <form action="/Exam/Delete" method="post" style="display:inline;">
+                            <input type="hidden" name="訂單號碼" value="@order.OrderId" />
+                            <button type="submit" style="color: red;" onclick="return confirm('🚨 確定要永久刪除這筆訂單嗎？')">刪除</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+
+<br />
+<br />
+
+
+<div style="margin-top: 15px; text-align: center; background-color: #fafafa; padding: 15px; border-radius: 5px;">
+
+    <span>頁碼導覽：</span>
+    @for (int i = 1; i <= ViewBag.TotalPages; i++)
+    {
+        if (i == ViewBag.CurrentPage)
+        {
+            <strong style="margin: 0 8px; color: red; font-size: 1.2em;">@i</strong>
+        }
+        else
+        {
+            <a href="/Exam?page=@i&searchString=@ViewBag.SearchString&shipViaSelection=@ViewBag.ShipViaSelection&employeeSelection=@ViewBag.EmployeeSelection" style="margin: 0 5px;">[@i]</a>
+        }
+    }
+    <span>( 總共 @ViewBag.TotalPages 頁 )</span>
+
+
+    <div style="margin-top: 15px;"></div>
+
+
+    <form action="/Exam" method="get" style="display: inline-block;">
+
+        <input type="hidden" name="searchString" value="@ViewBag.SearchString" />
+        <input type="hidden" name="shipViaSelection" value="@ViewBag.ShipViaSelection" />
+
+        <input type="hidden" name="employeeSelection" value="@ViewBag.EmployeeSelection" />
+
+        <span>跳至第 </span>
+        <input type="number" name="page" min="1" max="@ViewBag.TotalPages" value="@ViewBag.CurrentPage" style="width: 60px; text-align: center;" required />
+        <span> 頁 </span>
+
+        <button type="submit">確定跳轉</button>
+
+    </form>
+
+</div>
+
+
+<br />
+<br />
+
+
+<h3>📊 依資料庫動態統計：各送貨方式訂單數</h3>
+<canvas id="myBasicChart" width="500" height="180"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    var ctx = document.getElementById('myBasicChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            // 💡 後端全域撈取的 X 軸分類字串（已透過 C# 串裝成 JS 陣列）
+            labels: [ @Html.Raw(string.Join(",", ((List<string>)ViewBag.ChartLabels).Select(x => $"'{x}'"))) ],
+            datasets: [{
+                label: '實時訂單總數',
+                // 💡 後端統計出來的 Y 軸數據數字
+                data: [ @string.Join(",", (List<int>)ViewBag.ChartCounts) ],
+                backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: false,
+            scales: {
+                y: {
+                    beginAtZero: true // 確保 Y 軸數字從 0 開始畫起
+                }
+            }
+        }
+    });
+</script>
+
+
+<br />
+<br />
+<hr style="border: 1px dashed #ccc;" />
+<br />
+<br />
+
+
+<div style="background-color: #edf7ed; padding: 20px; border-radius: 5px;">
+
+    <h3 style="margin-top: 0; color: #1e4620;">📥 新增新訂單資料</h3>
+
+    <form action="/Exam/Create" method="post">
+
+        客戶編號: <input type="text" name="客戶編號" required />&nbsp;&nbsp;
+        員工編號: <input type="number" name="員工編號" required />&nbsp;&nbsp;
+        送貨方式: <input type="number" name="送貨方式" required />
+
+        <br /><br />
+
+        收貨人: <input type="text" name="收貨人" required />&nbsp;&nbsp;
+        送貨地址: <input type="text" name="送貨地址" required />
+
+        <br /><br />
+
+        城市: <input type="text" name="送貨城市" />&nbsp;&nbsp;
+        行政區: <input type="text" name="送貨行政區" />&nbsp;&nbsp;
+        郵遞區號: <input type="text" name="送貨郵遞區號" />
+
+        <br /><br />
+
+        <button type="submit" style="background-color: #2e7d32; color: white; padding: 5px 15px; border: none; border-radius: 3px; cursor: pointer; font-weight: bold;">
+            執行新增
+        </button>
+
+    </form>
+
+</div>
+
+<br />
+<br />

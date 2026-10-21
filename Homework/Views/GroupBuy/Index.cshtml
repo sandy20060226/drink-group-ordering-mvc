@@ -1,0 +1,540 @@
+﻿@{
+    Layout = null;
+    var voteResults = ViewBag.VoteResults as Dictionary<string, int> ?? new Dictionary<string, int>();
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    bool showOnlyMe = ViewBag.ShowOnlyMe ?? false;
+}
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>揪Drink 飲料即時湊團大廳</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .welcome-bar {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+            .welcome-bar h2 {
+                margin: 0;
+                font-size: 24px;
+            }
+
+        .logout-btn {
+            color: #fff;
+            background-color: #e53e3e;
+            padding: 8px 16px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .today-banner {
+            background-color: #fffaf0;
+            border: 2px dashed #dd6b20;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #dd6b20;
+        }
+
+        .network-status-box {
+            background-color: #fff;
+            border-left: 5px solid #3182ce;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .progress-bar-container {
+            background-color: #edf2f7;
+            border-radius: 20px;
+            height: 24px;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            background: linear-gradient(90deg, #48bb78, #38a169);
+            height: 100%;
+            text-align: center;
+            color: white;
+            line-height: 24px;
+            font-size: 12px;
+            font-weight: bold;
+            transition: width 0.5s;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 20px;
+        }
+
+        .left-column, .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .panel {
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        .panel-header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #edf2f7;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .panel h3 {
+            margin: 0;
+            color: #2d3748;
+        }
+
+        .filter-btn-group {
+            display: flex;
+            gap: 5px;
+        }
+
+        .filter-btn {
+            padding: 6px 12px;
+            background-color: #edf2f7;
+            color: #4a5568;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+            .filter-btn:hover {
+                background-color: #cbd5e0;
+            }
+
+            .filter-btn.active {
+                background-color: #4a5568;
+                color: white;
+            }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0 20px 0;
+            border: 1px solid #cbd5e0;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        .table-input {
+            padding: 6px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: inline-block;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: #3182ce;
+            color: white;
+        }
+
+            .btn-primary:hover {
+                background-color: #2b6cb0;
+            }
+
+        .btn-success {
+            background-color: #38a169;
+            color: white;
+            padding: 8px;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .btn-save {
+            background-color: #319795;
+            color: white;
+            padding: 5px 10px;
+            font-size: 13px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-danger {
+            background-color: #e53e3e;
+            color: white;
+            padding: 5px 10px;
+            font-size: 13px;
+            border-radius: 4px;
+            width: auto;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px 8px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: middle;
+        }
+
+        th {
+            background-color: #f7fafc;
+        }
+
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #edf2f7;
+        }
+
+        .page-btn {
+            padding: 8px 16px;
+            background-color: #edf2f7;
+            color: #4a5568;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+            .page-btn:hover {
+                background-color: #cbd5e0;
+            }
+
+            .page-btn.active {
+                background-color: #3182ce;
+                color: white;
+            }
+
+            .page-btn.disabled {
+                background-color: #e2e8f0;
+                color: #a0aec0;
+                cursor: not-allowed;
+                pointer-events: none;
+            }
+
+        .page-info {
+            font-size: 14px;
+            color: #718096;
+        }
+
+        .vote-bar-wrapper {
+            margin-bottom: 15px;
+        }
+
+        .vote-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .vote-bar-bg {
+            background-color: #edf2f7;
+            height: 15px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .vote-bar-inner {
+            background-color: #805ad5;
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s;
+        }
+
+        .error-alert {
+            background-color: #fff5f5;
+            border: 1px solid #fed7d7;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <div class="error-alert">🚨 @ViewBag.ErrorMessage</div>
+        }
+
+        <div class="welcome-bar">
+            <h2>揪Drink 飲料即時湊團大廳</h2>
+            <div>
+                <span>歡迎連線：<strong>@ViewBag.UserName (@ViewBag.UserAccount)</strong></span>
+                <a href="/Account/Logout" class="logout-btn" style="margin-left: 15px;">安全登出</a>
+            </div>
+        </div>
+
+        <div class="today-banner">
+            📢 今日決定開團店家：<span style="font-size: 22px; color: #c05621;">@ViewBag.TodayShop</span>
+        </div>
+
+        <div class="network-status-box">
+            <div class="status-header">
+                <div>當前總金額：<strong style="color:#e53e3e; font-size: 20px;">$@ViewBag.TotalPrice</strong> / $500</div>
+                <div>
+                    @if (ViewBag.IsFreeDelivery)
+                    {
+                        <span style="color:#38a169; font-weight:bold;">🎉 已達免運門檻！</span>
+                    }
+                    else
+                    {
+                        <span style="color:#dd6b20; font-weight:bold;">還差 $(@(500 - ViewBag.TotalPrice)) 元免運</span>
+                    }
+                </div>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" style="width: @(ViewBag.Progress)%;">免運進度：@ViewBag.Progress%</div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="left-column">
+                <div class="panel">
+                    <h3 style="border-bottom: 2px solid #edf2f7; padding-bottom: 10px; margin-bottom:15px;">點餐!</h3>
+                    <form action="/GroupBuy/CreateOrder" method="post">
+                        <label style="font-weight:bold;">選擇特調飲品 (@ViewBag.TodayShop)</label>
+
+                        <select id="drinkSelect" name="itemName" class="form-control" onchange="updatePrice()">
+                            <option value="黑糖珍珠鮮奶" data-price="65">黑糖珍珠鮮奶 - $65</option>
+                            <option value="泰泰鮮奶茶" data-price="60">泰泰鮮奶茶 - $60</option>
+                            <option value="老派紅茶" data-price="35">老派紅茶 - $35</option>
+                            <option value="蜂蜜檸檬菊花茶" data-price="55">蜂蜜檸檬菊花茶 - $55</option>
+                        </select>
+
+                        <label style="font-weight:bold;">自訂寫入金額</label>
+                        <input type="number" id="priceInput" name="price" class="form-control" value="65" />
+
+                        <button type="submit" class="btn btn-primary">確認點餐！🚀</button>
+                    </form>
+                </div>
+
+                <div class="panel">
+                    <h3 style="border-bottom: 2px solid #edf2f7; padding-bottom: 10px; margin-bottom:15px;">🗳️ 明天喝哪家？投票所</h3>
+                    <p style="font-size: 13px; color: #718096; margin-top:-10px;">每人可投多票，票數最高者為明日開團店家！</p>
+                    <form action="/GroupBuy/CastVote" method="post">
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <button type="submit" name="shopName" value="可不可熟成紅茶" class="btn btn-success" style="background-color:#2b6cb0;">👍 投給「可不可熟成紅茶」</button>
+                            <button type="submit" name="shopName" value="迷客夏 Milksha" class="btn btn-success" style="background-color:#38a169;">👍 投給「迷客夏 Milksha」</button>
+                            <button type="submit" name="shopName" value="50嵐" class="btn btn-success" style="background-color:#d69e2e;">👍 投給「50嵐」</button>
+                            <button type="submit" name="shopName" value="麻古茶坊" class="btn btn-success" style="background-color:#e53e3e;">👍 投給「麻古茶坊」</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="right-column">
+                <div class="panel">
+                    <div class="panel-header-flex">
+                        <h3>📋 當前點餐清單</h3>
+                        <div class="filter-btn-group">
+                            <a href="/GroupBuy/Index?page=1&showOnlyMe=false" class="filter-btn @(!showOnlyMe ? "active" : "")">🌐 顯示全部</a>
+                            <a href="/GroupBuy/Index?page=1&showOnlyMe=true" class="filter-btn @(showOnlyMe ? "active" : "")">🔍 我的點餐</a>
+                        </div>
+                    </div>
+
+                    @if (ViewBag.Orders != null && ViewBag.Orders.Count > 0)
+                    {
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 38%;">品項</th>
+                                    <th style="width: 20%;">點餐人</th>
+                                    <th style="width: 20%;">金額</th>
+                                    <th style="width: 22%;">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var order in ViewBag.Orders)
+                                {
+                                    <tr>
+                                        @if (showOnlyMe)
+                                        {
+                                            <td colspan="4" style="padding: 0;">
+                                                <table style="width: 100%; border-collapse: collapse; margin: 0;">
+                                                    <tr>
+                                                        <td style="width: 38%; border-bottom: none;">
+                                                            <form action="/GroupBuy/UpdateOrder" method="post" id="editForm_@order["Id"]" style="margin: 0; display: inline;">
+                                                                <input type="hidden" name="id" value="@order["Id"]" />
+                                                                <input type="hidden" name="currentPage" value="@currentPage" />
+                                                                <input type="hidden" name="showOnlyMe" value="true" />
+
+                                                                <select name="itemName" class="table-input">
+                                                                    <option value="黑糖珍珠鮮奶" selected="@(order["ItemName"] == "黑糖珍珠鮮奶")">黑糖珍珠鮮奶</option>
+                                                                    <option value="泰泰鮮奶茶" selected="@(order["ItemName"] == "泰泰鮮奶茶")">泰泰鮮奶茶</option>
+                                                                    <option value="老派紅茶" selected="@(order["ItemName"] == "老派紅茶")">老派紅茶</option>
+                                                                    <option value="蜂蜜檸檬菊花茶" selected="@(order["ItemName"] == "蜂蜜檸檬菊花茶")">蜂蜜檸檬菊花茶</option>
+                                                                </select>
+                                                            </form>
+                                                        </td>
+
+                                                        <td style="width: 20%; border-bottom: none;">@order["BuyerName"]</td>
+
+                                                        <td style="width: 20%; border-bottom: none;">
+                                                            <input type="number" name="price" form="editForm_@order["Id"]" class="table-input" value="@order["Price"]" style="font-weight:bold; color:#2b6cb0;" />
+                                                        </td>
+
+                                                        <td style="width: 22%; border-bottom: none;">
+                                                            <div style="display: flex; gap: 5px; align-items: center;">
+                                                                <button type="submit" form="editForm_@order["Id"]" class="btn-save">儲存</button>
+
+                                                                <form action="/GroupBuy/DeleteOrder" method="post" style="display: inline; margin: 0;">
+                                                                    <input type="hidden" name="id" value="@order["Id"]" />
+                                                                    <input type="hidden" name="currentPage" value="@currentPage" />
+                                                                    <input type="hidden" name="showOnlyMe" value="true" />
+                                                                    <button type="submit" class="btn btn-danger" style="margin: 0;">取消</button>
+                                                                </form>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td>@order["ItemName"]</td>
+                                            <td>@order["BuyerName"]</td>
+                                            <td style="font-weight:bold; color:#2b6cb0;">$@order["Price"]</td>
+                                            <td>
+                                                <form action="/GroupBuy/DeleteOrder" method="post" style="display:inline; margin: 0;">
+                                                    <input type="hidden" name="id" value="@order["Id"]" />
+                                                    <input type="hidden" name="currentPage" value="@currentPage" />
+                                                    <input type="hidden" name="showOnlyMe" value="false" />
+                                                    <button type="submit" class="btn btn-danger" style="margin: 0;">取消</button>
+                                                </form>
+                                            </td>
+                                        }
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+
+                        <div class="pagination-container">
+                            <a href="/GroupBuy/Index?page=@(currentPage - 1)&showOnlyMe=@(showOnlyMe.ToString().ToLower())"
+                               class="page-btn @(currentPage == 1 ? "disabled" : "")">⏮ 上一頁</a>
+
+                            <span class="page-info">第 <strong>@currentPage</strong> 頁 / 共 @totalPages 頁</span>
+
+                            <a href="/GroupBuy/Index?page=@(currentPage + 1)&showOnlyMe=@(showOnlyMe.ToString().ToLower())"
+                               class="page-btn @(currentPage == totalPages ? "disabled" : "")">下一頁 ⏭</a>
+                        </div>
+                    }
+                    else
+                    {
+                        <p style="color:#718096; text-align:center; padding:20px 0;">
+                            @(showOnlyMe ? "🔍 您目前還沒有點任何飲料喔！" : "目前無人點餐")
+                        </p>
+                    }
+                </div>
+
+                <div class="panel">
+                    <h3>📊 明日店家即時開票結果</h3>
+                    <div style="margin-top: 15px;">
+                        @foreach (var shop in voteResults)
+                        {
+                            int maxExpectedVotes = 20;
+                            double barWidth = ((double)shop.Value / maxExpectedVotes) * 100;
+                            if (barWidth > 100) barWidth = 100;
+
+                            <div class="vote-bar-wrapper">
+                                <div class="vote-label">
+                                    <span><strong>@shop.Key</strong></span>
+                                    <span style="color:#805ad5; font-weight:bold;">@shop.Value 票</span>
+                                </div>
+                                <div class="vote-bar-bg">
+                                    <div class="vote-bar-inner" style="width: @(barWidth)%;"></div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updatePrice() {
+            var drinkSelect = document.getElementById("drinkSelect");
+            var priceInput = document.getElementById("priceInput");
+
+            var selectedOption = drinkSelect.options[drinkSelect.selectedIndex];
+            var price = selectedOption.getAttribute("data-price");
+
+            priceInput.value = price;
+        }
+    </script>
+</body>
+</html>

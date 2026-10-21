@@ -1,0 +1,131 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>揪Drink! 飲料外送即時湊團系統</title>
+    <style>
+        body {
+            font-family: 'Arial', 'Microsoft JhengHei', sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 650px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .header {
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+            .header h1 {
+                color: #2c3e50;
+                font-size: 28px;
+                margin: 0 0 10px 0;
+            }
+
+        .student-info {
+            background-color: #ebf8ff;
+            color: #2b6cb0;
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: bold;
+            font-size: 16px;
+            margin-top: 5px;
+        }
+
+        .motivation-box {
+            text-align: left;
+            background-color: #f7fafc;
+            border-left: 5px solid #4299e1;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 0 8px 8px 0;
+        }
+
+            .motivation-box h2 {
+                color: #2d3748;
+                font-size: 18px;
+                margin-top: 0;
+            }
+
+            .motivation-box p {
+                line-height: 1.6;
+                color: #4a5568;
+                font-size: 15px;
+                margin: 0;
+            }
+
+        .btn-enter {
+            display: inline-block;
+            background-color: #48bb78;
+            color: white;
+            padding: 15px 35px;
+            font-size: 18px;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+            box-shadow: 0 4px 6px rgba(72, 187, 120, 0.2);
+        }
+
+            .btn-enter:hover {
+                background-color: #38a169;
+            }
+
+        .test-account {
+            margin-top: 20px;
+            font-size: 13px;
+            color: #718096;
+            background-color: #edf2f7;
+            padding: 8px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>揪Drink! 飲料外送即時湊團系統</h1>
+            <div class="student-info">
+                資管系 | 學號：1131619 | 姓名：林佳柔
+            </div>
+        </div>
+
+        <div class="motivation-box">
+            <h2>專案開發動機</h2>
+            <p>
+                平常在上班或是上課時，常常會有"這時候如果來一杯飲料該有多好"的時候，但常常會因為不敢開口問、想喝的飲料店家不同、收錢無法收齊、湊不到免運等混亂痛點，導致想喝飲料的時候卻喝不到<br><br>
+                本系統創新地將「飲料揪團」包裝成微型的網路資產管理模型——將擁有選店投票的功能，每位點餐的使用者則是透過標準的資料庫增刪查改（CRUD）功能，完美解決日常湊單的混亂，達到揪團效率的最佳化配置！
+            </p>
+        </div>
+
+        <div>
+            <a href="/Account/Login" class="btn-enter">進入湊團系統</a>
+            <br>
+            <div class="test-account">
+                系統測試帳號：<strong style="color: #e53e3e;">Bubble Tea</strong> &nbsp;|&nbsp; 測試密碼：<strong style="color: #e53e3e;">2222</strong>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

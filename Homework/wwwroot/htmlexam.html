@@ -1,0 +1,30 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>登入頁面</title>
+</head>
+<body>
+
+    <h2>系統登入</h2>
+    <p>學號：1131619</p>
+    <p>姓名：林佳柔</p>
+
+    <p id="errorBox" style="color:red;"></p>
+
+    <form action="/Exam/Login" method="post">
+        帳號: <input type="text" name="txtUser" required /><br /><br />
+        密碼: <input type="password" name="txtPwd" required /><br /><br />
+        <button type="submit">登入</button>
+    </form>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('error') === '1') {
+            document.getElementById('errorBox').innerText = "帳號或密碼錯誤！";
+        } else if (urlParams.get('error') === 'auth') {
+            document.getElementById('errorBox').innerText = "請先登入！";
+        }
+    </script>
+</body>
+</html>

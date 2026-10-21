@@ -1,0 +1,101 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>揪Drink - 系統登入</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            width: 320px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #1e3c72;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: #1e3c72;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+            .btn-login:hover {
+                background: #2a5298;
+            }
+
+        .message {
+            color: #e53e3e;
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h2>揪Drink 系統登入</h2>
+
+        <form action="/Account/Login" method="post">
+            <div class="form-group">
+                <label>帳號 (Account)</label>
+                <input type="text" name="username" placeholder="請輸入帳號" required />
+            </div>
+            <div class="form-group">
+                <label>密碼 (Password)</label>
+                <input type="password" name="password" placeholder="請輸入密碼" required />
+            </div>
+            <button type="submit" class="btn-login">安全登入</button>
+        </form>
+
+        @if (ViewBag.Message != null)
+        {
+            <div class="message">⚠️ @ViewBag.Message</div>
+        }
+    </div>
+
+</body>
+</html>
